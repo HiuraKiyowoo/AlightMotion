@@ -213,8 +213,8 @@ export default function App() {
         {/* Hero */}
         <section style={S.hero} id="aktifkan">
           <h1 style={S.h1}>
-            Masukkan email.<br />
-            Aktifkan <span style={{ color: "var(--mint)" }}>akunnya.</span>
+            HIURA<br />
+            <span style={{ color: "var(--mint)" }}>ALIGHT MOTION.</span>
           </h1>
           <p style={S.sub}>
             Kirim kode aktivasi ke email, lalu paste link verifikasi dari inbox kamu.
@@ -260,7 +260,7 @@ export default function App() {
           <div className="slot">
             <div className="slot-icon">▶</div>
             <textarea
-              placeholder={"Paste link verifikasi dari email di sini...\n(bisa format javascript:parent.ActionWin... atau URL biasa)"}
+              placeholder={"Paste link verifikasi dari email di sini..."}
               value={link}
               onChange={e => setLink(e.target.value)}
             />
