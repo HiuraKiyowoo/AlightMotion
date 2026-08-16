@@ -97,20 +97,6 @@ export default function App() {
         }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-        .kf-row {
-          display: flex; gap: 14px; padding: 10px 24px;
-          border-bottom: 1px solid var(--line);
-          overflow: hidden;
-          background: repeating-linear-gradient(90deg, #181620 0 2px, transparent 2px 20px);
-        }
-        .kf-row span {
-          width: 8px; height: 8px;
-          background: #2E2B40;
-          transform: rotate(45deg);
-          flex: none;
-        }
-        .kf-row span.lit { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
-
         .slot {
           display: flex; gap: 0;
           background: var(--panel);
@@ -216,18 +202,10 @@ export default function App() {
         a:hover { text-decoration: underline; }
       `}</style>
 
-      {/* Keyframe row */}
-      <div className="kf-row" aria-hidden="true">
-        {Array.from({ length: 24 }, (_, i) => (
-          <span key={i} className={[2,7,13,19].includes(i) ? "lit" : ""} />
-        ))}
-      </div>
-
       {/* Header */}
       <header style={S.header}>
         <div style={S.logo}>
-          <div style={S.logoDot} />
-          AMACTIVATOR
+          HIURA AMACTIVATOR
         </div>
         <nav style={{ display: "flex", gap: 24 }}>
           <a href="#aktifkan" style={S.navLink}>Aktifkan</a>
@@ -239,7 +217,6 @@ export default function App() {
 
         {/* Hero */}
         <section style={S.hero} id="aktifkan">
-          <div style={S.eyebrow}>ZNN // alight creative activation</div>
           <h1 style={S.h1}>
             Masukkan email.<br />
             Aktifkan <span style={{ color: "var(--mint)" }}>akunnya.</span>
@@ -353,10 +330,7 @@ export default function App() {
 
       </main>
 
-      <footer style={S.footer}>
-        <span>AMACTIVATOR — znn-alightmotion.vercel.app</span>
-        <span style={{ color: "var(--dim)" }}>made with ♥</span>
-      </footer>
+
     </>
   );
 }
@@ -372,10 +346,6 @@ const S = {
     fontSize: 17, letterSpacing: 0.5,
     display: "flex", alignItems: "center", gap: 9,
     color: "var(--ink)",
-  },
-  logoDot: {
-    width: 9, height: 9, borderRadius: "50%",
-    background: "var(--mint)", boxShadow: "0 0 10px var(--mint)",
   },
   navLink: {
     color: "var(--dim)", textDecoration: "none",
@@ -419,13 +389,5 @@ const S = {
   guideList: {
     borderTop: "1px solid var(--line)",
     marginTop: 8,
-  },
-  footer: {
-    maxWidth: 860, margin: "0 auto",
-    padding: "16px 24px",
-    borderTop: "1px solid var(--line)",
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 11, color: "var(--dim)",
-    display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8,
   },
 };
