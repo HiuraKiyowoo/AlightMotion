@@ -134,7 +134,7 @@ export default function App() {
                 <Field label="Link Verifikasi dari Email">
                   <textarea
                     style={{ ...S.input, height: 110, lineHeight: 1.55, paddingTop: 10 }}
-                    placeholder={"Paste link atau javascript:parent.ActionWin... di sini"}
+                    placeholder={"Paste link alight... di sini"}
                     value={link}
                     onChange={e => setLink(e.target.value)}
                   />
