@@ -9,13 +9,6 @@ function extractLink(raw) {
   return raw;
 }
 
-function fmt(n) {
-  if (!n && n !== 0) return "—";
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
-  return String(n);
-}
-
 export default function App() {
   const [email, setEmail]   = useState("");
   const [link, setLink]     = useState("");
@@ -26,18 +19,14 @@ export default function App() {
   const [sent, setSent] = useState(false);
 
   async function safePost(url, payload) {
-    const res  = await fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(payload),
     });
     const text = await res.text();
-    try {
-      return JSON.parse(text);
-    } catch {
-      // API returned non-JSON (HTML error page, plain text, etc.)
-      return { status: false, message: text.slice(0, 200) || `HTTP ${res.status}` };
-    }
+    try { return JSON.parse(text); }
+    catch { return { status: false, message: text.slice(0, 200) || `HTTP ${res.status}` }; }
   }
 
   async function handleSend() {
@@ -47,9 +36,7 @@ export default function App() {
       const data = await safePost(SEND_URL, { email: email.trim() });
       setSendResult({ ok: data.status, msg: data.message });
       if (data.status) setSent(true);
-    } catch (e) {
-      setSendResult({ ok: false, msg: e.message });
-    }
+    } catch (e) { setSendResult({ ok: false, msg: e.message }); }
     setSending(false);
   }
 
@@ -60,9 +47,7 @@ export default function App() {
       const decoded = extractLink(link.trim());
       const data = await safePost(VERIFY_URL, { email: email.trim(), link: decoded });
       setVerifResult({ ok: data.status, msg: data.message });
-    } catch (e) {
-      setVerifResult({ ok: false, msg: e.message });
-    }
+    } catch (e) { setVerifResult({ ok: false, msg: e.message }); }
     setVerifying(false);
   }
 
@@ -97,73 +82,112 @@ export default function App() {
         }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-        .slot {
-          display: flex; gap: 0;
+        /* ── Step card ── */
+        .step-card {
           background: var(--panel);
           border: 1px solid var(--line);
-          border-radius: 10px;
-          padding: 6px;
-          align-items: flex-start;
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+          border-radius: 14px;
+          overflow: hidden;
         }
-        .slot-icon {
-          color: var(--mint); font-size: 13px;
-          padding: 13px 12px 0; flex: none;
+
+        .step-head {
+          display: flex; align-items: center; gap: 12px;
+          padding: 14px 18px;
+          border-bottom: 1px solid var(--line);
+        }
+        .step-num {
           font-family: 'JetBrains Mono', monospace;
+          font-size: 10px; font-weight: 700; letter-spacing: 1px;
+          color: var(--mint);
+          background: rgba(93,255,184,0.08);
+          border: 1px solid rgba(93,255,184,0.2);
+          border-radius: 5px;
+          padding: 3px 8px;
         }
-        .slot input, .slot textarea {
-          flex: 1; background: transparent; border: 0; outline: 0;
+        .step-title {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px; letter-spacing: 1.5px;
+          color: var(--dim); text-transform: uppercase;
+        }
+
+        .step-body {
+          display: flex; align-items: stretch;
+          height: 88px;
+        }
+        .step-body input,
+        .step-body textarea {
+          flex: 1;
+          background: transparent; border: 0; outline: 0;
           color: var(--ink);
           font-family: 'JetBrains Mono', monospace;
-          font-size: 14px; padding: 12px 6px;
+          font-size: 13px;
+          padding: 0 18px;
           resize: none;
+          line-height: 1.55;
         }
-        .slot input::placeholder, .slot textarea::placeholder { color: #3D3B52; }
-        .slot textarea { height: 88px; line-height: 1.5; font-size: 13px; padding-top: 13px; }
+        .step-body input { height: 100%; }
+        .step-body textarea { padding-top: 18px; }
+        .step-body input::placeholder,
+        .step-body textarea::placeholder { color: #3D3B52; }
 
-        .slot-btn {
-          background: var(--mint); color: #081810;
-          border: 0; border-radius: 7px;
-          padding: 12px 18px;
-          font-weight: 700; font-size: 13px;
-          cursor: pointer;
-          font-family: 'Inter', sans-serif;
-          letter-spacing: 0.3px;
-          transition: transform .1s, background .1s;
-          flex: none; align-self: flex-end; margin-bottom: 0;
+        .step-divider {
+          width: 1px; background: var(--line); flex: none;
         }
-        .slot-btn:hover:not(:disabled) { background: #7AFFD0; transform: translateY(-1px); }
-        .slot-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-        .slot-btn.danger { background: var(--red); color: #fff; }
-        .slot-btn.danger:hover:not(:disabled) { background: #ff7070; }
+
+        .step-btn {
+          background: transparent;
+          border: 0;
+          color: var(--mint);
+          font-family: 'Archivo Black', sans-serif;
+          font-size: 12px; letter-spacing: 1px;
+          cursor: pointer;
+          padding: 0 22px;
+          flex: none;
+          transition: background .15s, color .15s;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+        .step-btn:hover:not(:disabled) {
+          background: rgba(93,255,184,0.07);
+        }
+        .step-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .scanline {
           height: 2px; width: 100%;
           background: linear-gradient(90deg, transparent, var(--mint), transparent);
           background-size: 200% 100%;
           animation: scan 1.2s linear infinite;
-          margin-top: 12px; border-radius: 2px;
+          border-radius: 0 0 14px 14px;
         }
 
         .status-msg {
           font-family: 'JetBrains Mono', monospace;
           font-size: 12px; margin-top: 10px;
           padding: 10px 14px;
-          border-radius: 7px;
+          border-radius: 8px;
           border: 1px solid var(--line);
         }
         .status-msg.ok  { border-color: rgba(93,255,184,0.25); color: var(--mint); background: rgba(93,255,184,0.05); }
         .status-msg.err { border-color: rgba(255,82,82,0.25);  color: var(--red);  background: rgba(255,82,82,0.05); }
 
-        .step-label {
+        .hint {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 11px; letter-spacing: 2px;
-          color: var(--dim); text-transform: uppercase;
-          margin-bottom: 10px;
-          display: flex; align-items: center; gap: 10px;
+          font-size: 11px; color: var(--dim); margin-top: 9px;
         }
-        .step-label::after {
-          content: ''; flex: 1; height: 1px; background: var(--line);
+
+        .email-tag {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px; color: var(--mint);
+          background: rgba(93,255,184,0.06);
+          border: 1px solid rgba(93,255,184,0.18);
+          border-radius: 6px; padding: 6px 12px;
+          margin-bottom: 12px;
+        }
+        .email-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: var(--mint);
+          animation: pulse 1.5s ease-in-out infinite;
         }
 
         .guide-step {
@@ -183,35 +207,14 @@ export default function App() {
         .guide-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
         .guide-desc  { font-size: 13px; color: var(--dim); line-height: 1.55; font-family: 'JetBrains Mono', monospace; }
 
-        .email-tag {
-          display: inline-flex; align-items: center; gap: 8px;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 12px; color: var(--mint);
-          background: rgba(93,255,184,0.06);
-          border: 1px solid rgba(93,255,184,0.18);
-          border-radius: 6px; padding: 6px 12px;
-          margin-bottom: 12px;
-        }
-        .email-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: var(--mint);
-          animation: pulse 1.5s ease-in-out infinite;
-        }
-
         a { color: var(--mint); text-decoration: none; }
         a:hover { text-decoration: underline; }
       `}</style>
 
-      {/* Header */}
-      <header style={S.header}>
-
-
-      </header>
-
       <main style={S.main}>
 
         {/* Hero */}
-        <section style={S.hero} id="aktifkan">
+        <section style={S.hero}>
           <h1 style={S.h1}>
             HIURA<br />
             <span style={{ color: "var(--mint)" }}>ALIGHT MOTION.</span>
@@ -223,24 +226,29 @@ export default function App() {
         </section>
 
         {/* Step 1 */}
-        <section style={{ marginBottom: 28 }}>
-          <div className="step-label">Langkah 01 — Kirim Kode</div>
-          <div className="slot">
-            <div className="slot-icon">▶</div>
-            <input
-              type="email"
-              placeholder="alamat email kamu..."
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleSend()}
-            />
-            <button className="slot-btn" onClick={handleSend}
-              disabled={sending || !email.trim()}>
-              {sending ? "Mengirim…" : "Kirim"}
-            </button>
+        <section style={{ marginBottom: 16 }}>
+          <div className="step-card">
+            <div className="step-head">
+              <span className="step-num">01</span>
+              <span className="step-title">Kirim Kode</span>
+            </div>
+            <div className="step-body">
+              <input
+                type="email"
+                placeholder="alamat email kamu..."
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSend()}
+              />
+              <div className="step-divider" />
+              <button className="step-btn" onClick={handleSend}
+                disabled={sending || !email.trim()}>
+                {sending ? "Mengirim…" : "Kirim"}
+              </button>
+            </div>
+            {sending && <div className="scanline" />}
           </div>
-          <div style={S.hint}>Cek folder inbox dan spam setelah klik Kirim.</div>
-          {sending && <div className="scanline" />}
+          <div className="hint">Cek folder inbox dan spam setelah klik Kirim.</div>
           {sendResult && (
             <div className={`status-msg ${sendResult.ok ? "ok" : "err"}`}>
               {sendResult.ok ? "✓ " : "✗ "}{sendResult.msg}
@@ -249,33 +257,37 @@ export default function App() {
         </section>
 
         {/* Step 2 */}
-        <section style={{ marginBottom: 48 }}>
-          <div className="step-label">Langkah 02 — Verifikasi Link</div>
+        <section style={{ marginBottom: 56 }}>
           {email && sent && (
             <div className="email-tag">
               <div className="email-dot" />
               {email}
             </div>
           )}
-          <div className="slot">
-            <div className="slot-icon">▶</div>
-            <textarea
-              placeholder={"Paste link verifikasi dari email di sini..."}
-              value={link}
-              onChange={e => setLink(e.target.value)}
-            />
-            <button className="slot-btn" onClick={handleVerif}
-              style={{ alignSelf: "flex-end", marginBottom: 0 }}
-              disabled={verifying || !link.trim()}>
-              {verifying ? "Proses…" : "Verif"}
-            </button>
+          <div className="step-card">
+            <div className="step-head">
+              <span className="step-num">02</span>
+              <span className="step-title">Verifikasi Link</span>
+            </div>
+            <div className="step-body">
+              <textarea
+                placeholder="Paste link verifikasi dari email di sini..."
+                value={link}
+                onChange={e => setLink(e.target.value)}
+              />
+              <div className="step-divider" />
+              <button className="step-btn" onClick={handleVerif}
+                disabled={verifying || !link.trim()}>
+                {verifying ? "Proses…" : "Verif"}
+              </button>
+            </div>
+            {verifying && <div className="scanline" />}
           </div>
           {!sent && (
-            <div style={{ ...S.hint, color: "rgba(255,82,82,0.7)", marginTop: 8 }}>
+            <div className="hint" style={{ color: "rgba(255,82,82,0.7)" }}>
               ! Selesaikan langkah 01 terlebih dahulu.
             </div>
           )}
-          {verifying && <div className="scanline" />}
           {verifResult && (
             <div className={`status-msg ${verifResult.ok ? "ok" : "err"}`}>
               {verifResult.ok ? "✓ " : "✗ "}{verifResult.msg}
@@ -284,33 +296,17 @@ export default function App() {
         </section>
 
         {/* Cara Penggunaan */}
-        <section id="cara-pakai" style={S.guideSection}>
+        <section style={S.guideSection}>
           <div style={S.guideHeader}>
             <div style={S.eyebrow}>panduan</div>
             <h2 style={S.h2}>Cara Penggunaan</h2>
           </div>
           <div style={S.guideList}>
             {[
-              {
-                n: "01",
-                title: "Masukkan email kamu",
-                desc: "Ketik atau paste alamat email di kolom Langkah 01, lalu klik tombol Kirim.",
-              },
-              {
-                n: "02",
-                title: "Cek inbox atau spam",
-                desc: "Buka email dari Alight Creative. Jika tidak ada di inbox, periksa folder Spam atau Junk.",
-              },
-              {
-                n: "03",
-                title: "Salin link verifikasi",
-                desc: "Di email, klik kanan tombol Login → Salin alamat tautan. Atau copy langsung teks link-nya.",
-              },
-              {
-                n: "04",
-                title: "Paste & verifikasi",
-                desc: "Paste link tersebut di kolom Langkah 02, lalu klik Verif. Akun kamu langsung aktif.",
-              },
+              { n: "01", title: "Masukkan email kamu", desc: "Ketik atau paste alamat email di kolom Langkah 01, lalu klik tombol Kirim." },
+              { n: "02", title: "Cek inbox atau spam", desc: "Buka email dari Alight Creative. Jika tidak ada di inbox, periksa folder Spam atau Junk." },
+              { n: "03", title: "Salin link verifikasi", desc: "Di email, klik kanan tombol Login → Salin alamat tautan. Atau copy langsung teks link-nya." },
+              { n: "04", title: "Paste & verifikasi", desc: "Paste link tersebut di kolom Langkah 02, lalu klik Verif. Akun kamu langsung aktif." },
             ].map(g => (
               <div className="guide-step" key={g.n}>
                 <div className="guide-num">{g.n}</div>
@@ -325,7 +321,6 @@ export default function App() {
 
       </main>
 
-
       <footer style={{ textAlign: "center", padding: "24px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--dim)" }}>
         HIURA AMACTIVATOR
       </footer>
@@ -334,26 +329,11 @@ export default function App() {
 }
 
 const S = {
-  header: {
-    padding: "16px 24px 12px",
-    display: "flex", alignItems: "center", justifyContent: "space-between",
-    maxWidth: 860, margin: "0 auto",
-  },
-  logo: {
-    fontFamily: "'Archivo Black', sans-serif",
-    fontSize: 17, letterSpacing: 0.5,
-    display: "flex", alignItems: "center", gap: 9,
-    color: "var(--ink)",
-  },
-  navLink: {
-    color: "var(--dim)", textDecoration: "none",
-    fontSize: 12, fontFamily: "'JetBrains Mono', monospace",
-  },
   main: {
-    maxWidth: 860, margin: "0 auto", padding: "20px 24px 80px",
+    maxWidth: 680, margin: "0 auto", padding: "48px 24px 80px",
   },
   hero: {
-    padding: "28px 0 28px",
+    paddingBottom: 40,
   },
   eyebrow: {
     fontFamily: "'JetBrains Mono', monospace",
@@ -363,21 +343,17 @@ const S = {
   },
   h1: {
     fontFamily: "'Archivo Black', sans-serif",
-    fontSize: "clamp(30px, 5vw, 50px)",
+    fontSize: "clamp(36px, 6vw, 58px)",
     lineHeight: 1.06, marginBottom: 14, letterSpacing: "-0.5px",
   },
   h2: {
     fontFamily: "'Archivo Black', sans-serif",
-    fontSize: 26, letterSpacing: "-0.3px",
+    fontSize: 22, letterSpacing: "-0.3px",
     marginBottom: 24, marginTop: 6,
   },
   sub: {
-    color: "var(--dim)", fontSize: 15,
-    maxWidth: 500, lineHeight: 1.6, marginBottom: 28,
-  },
-  hint: {
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 11, color: "var(--dim)", marginTop: 8,
+    color: "var(--dim)", fontSize: 14,
+    maxWidth: 460, lineHeight: 1.65,
   },
   guideSection: {
     borderTop: "1px solid var(--line)",
