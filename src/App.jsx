@@ -35,14 +35,14 @@ export default function App() {
   }
 
   async function handleVerif() {
-    if (!link.trim() || !verifEmail.trim()) return;
+    if (!link.trim()) return;
     setLoading(true); setResult(null);
     try {
       const decoded = extractLink(link.trim());
       const res  = await fetch(VERIFY_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: verifEmail.trim(), link: decoded }),
+        body: JSON.stringify({ email: email.trim(), link: decoded }),
       });
       const data = await res.json();
       setResult({ ok: data.status, msg: data.message });
@@ -70,6 +70,7 @@ export default function App() {
         .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .tab:hover { color: #A78BFA; }
         textarea { resize: vertical; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 480px) {
           .card { border-radius: 12px; }
           .inner { padding: 20px !important; }
@@ -82,14 +83,12 @@ export default function App() {
 
         <div className="card" style={S.card}>
 
-          {/* ── Header ── */}
           <div className="head" style={S.head}>
             <div style={S.logo}>AM</div>
             <h1 style={S.title}>Aktivasi ALight Motion</h1>
             <p style={S.sub}>Masuk ke akun Alight Creative kamu</p>
           </div>
 
-          {/* ── Tabs ── */}
           <div style={S.tabs}>
             {["send", "verif"].map((t, i) => (
               <button
@@ -104,7 +103,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* ── Body ── */}
           <div className="inner" style={S.inner}>
 
             {tab === "send" ? (
@@ -123,38 +121,36 @@ export default function App() {
                   disabled={loading || !email.trim()}>
                   {loading ? <Spinner /> : "Kirim Kode Aktivasi →"}
                 </button>
-                <p style={S.hint}>
-                  Cek inbox atau folder spam setelah mengirim.
-                </p>
+                <p style={S.hint}>Cek inbox atau folder spam setelah mengirim.</p>
               </div>
             ) : (
               <div style={S.fields}>
+                {email && (
+                  <div style={S.emailTag}>
+                    <span style={S.emailDot} />
+                    {email}
+                  </div>
+                )}
                 <Field label="Link Verifikasi dari Email">
                   <textarea
-                    style={{ ...S.input, height: 90, lineHeight: 1.55, paddingTop: 10 }}
+                    style={{ ...S.input, height: 110, lineHeight: 1.55, paddingTop: 10 }}
                     placeholder={"Paste link atau javascript:parent.ActionWin... di sini"}
                     value={link}
                     onChange={e => setLink(e.target.value)}
                   />
                 </Field>
-                <Field label="Alamat Email">
-                  <input
-                    style={S.input}
-                    type="email"
-                    placeholder="contoh@email.com"
-                    value={verifEmail}
-                    onChange={e => setVEmail(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleVerif()}
-                  />
-                </Field>
                 <button className="btn" style={S.btn} onClick={handleVerif}
-                  disabled={loading || !link.trim() || !verifEmail.trim()}>
+                  disabled={loading || !link.trim()}>
                   {loading ? <Spinner /> : "Verifikasi Sekarang →"}
                 </button>
+                {!email && (
+                  <p style={{ ...S.hint, color: "#7C3AED" }}>
+                    ⚠ Kirim kode di tab 1 dulu agar email terisi otomatis.
+                  </p>
+                )}
               </div>
             )}
 
-            {/* ── Result ── */}
             {result && (
               <div style={{ ...S.result, ...(result.ok ? S.ok : S.err) }}>
                 <span style={{ ...S.badge, color: result.ok ? "#34D399" : "#F87171" }}>
@@ -165,9 +161,8 @@ export default function App() {
             )}
           </div>
 
-          {/* ── Footer ── */}
           <div style={S.foot}>
-            <span style={S.footTxt}>znn-alightmotion.vercel.app</span>
+            <span style={S.footTxt}>Hiura</span>
           </div>
         </div>
       </div>
@@ -194,8 +189,6 @@ function Spinner() {
     }} />
   );
 }
-
-// ── Styles ────────────────────────────────────────────────────────────────
 
 const S = {
   root: {
@@ -241,9 +234,7 @@ const S = {
     fontSize: 19, fontWeight: 700, color: "#F1F1F3",
     letterSpacing: "-0.3px", marginBottom: 6,
   },
-  sub: {
-    fontSize: 13, color: "#5A5A66",
-  },
+  sub: { fontSize: 13, color: "#5A5A66" },
   tabs: {
     display: "grid", gridTemplateColumns: "1fr 1fr",
     borderBottom: "1px solid #1C1C20",
@@ -274,9 +265,7 @@ const S = {
     padding: "24px 32px 28px",
     display: "flex", flexDirection: "column", gap: 0,
   },
-  fields: {
-    display: "flex", flexDirection: "column", gap: 14,
-  },
+  fields: { display: "flex", flexDirection: "column", gap: 14 },
   label: {
     fontSize: 11, fontWeight: 700, letterSpacing: "0.6px",
     textTransform: "uppercase", color: "#52525E",
@@ -303,37 +292,30 @@ const S = {
     boxShadow: "0 4px 16px rgba(109,40,217,0.3)",
     letterSpacing: "0.1px",
   },
-  hint: {
-    fontSize: 12, color: "#3E3E4A", textAlign: "center", lineHeight: 1.6,
-  },
+  hint: { fontSize: 12, color: "#3E3E4A", textAlign: "center", lineHeight: 1.6 },
   result: {
     marginTop: 20, borderRadius: 8,
-    padding: "13px 16px",
-    border: "1px solid",
+    padding: "13px 16px", border: "1px solid",
   },
-  ok: {
-    background: "rgba(16,185,129,0.06)",
-    borderColor: "rgba(16,185,129,0.22)",
-  },
-  err: {
-    background: "rgba(239,68,68,0.06)",
-    borderColor: "rgba(239,68,68,0.22)",
-  },
+  ok: { background: "rgba(16,185,129,0.06)", borderColor: "rgba(16,185,129,0.22)" },
+  err: { background: "rgba(239,68,68,0.06)", borderColor: "rgba(239,68,68,0.22)" },
   badge: {
     display: "block",
     fontSize: 11, fontWeight: 800,
-    letterSpacing: "0.7px", textTransform: "uppercase",
-    marginBottom: 5,
+    letterSpacing: "0.7px", textTransform: "uppercase", marginBottom: 5,
   },
-  resultMsg: {
-    fontSize: 13, color: "#8A8A99", lineHeight: 1.6,
+  resultMsg: { fontSize: 13, color: "#8A8A99", lineHeight: 1.6 },
+  emailTag: {
+    display: "flex", alignItems: "center", gap: 8,
+    background: "rgba(109,40,217,0.08)",
+    border: "1px solid rgba(109,40,217,0.2)",
+    borderRadius: 6, padding: "8px 12px",
+    fontSize: 13, color: "#A78BFA", fontWeight: 500,
   },
-  foot: {
-    borderTop: "1px solid #1A1A1E",
-    padding: "12px 32px",
-    textAlign: "center",
+  emailDot: {
+    width: 7, height: 7, borderRadius: "50%",
+    background: "#7C3AED", flexShrink: 0,
   },
-  footTxt: {
-    fontSize: 11, color: "#2E2E38", letterSpacing: "0.3px",
-  },
+  foot: { borderTop: "1px solid #1A1A1E", padding: "12px 32px", textAlign: "center" },
+  footTxt: { fontSize: 11, color: "#2E2E38", letterSpacing: "0.3px" },
 };
