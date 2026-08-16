@@ -204,13 +204,8 @@ export default function App() {
 
       {/* Header */}
       <header style={S.header}>
-        <div style={S.logo}>
-          HIURA AMACTIVATOR
-        </div>
-        <nav style={{ display: "flex", gap: 24 }}>
-          <a href="#aktifkan" style={S.navLink}>Aktifkan</a>
-          <a href="#cara-pakai" style={S.navLink}>Cara Pakai</a>
-        </nav>
+
+
       </header>
 
       <main style={S.main}>
@@ -331,6 +326,9 @@ export default function App() {
       </main>
 
 
+      <footer style={{ textAlign: "center", padding: "24px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--dim)" }}>
+        HIURA AMACTIVATOR
+      </footer>
     </>
   );
 }
