@@ -10,12 +10,11 @@ function extractLink(raw) {
 }
 
 export default function App() {
-  const [tab, setTab]           = useState("send");
-  const [email, setEmail]       = useState("");
-  const [link, setLink]         = useState("");
-  const [verifEmail, setVEmail] = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [result, setResult]     = useState(null);
+  const [tab, setTab]     = useState("send");
+  const [email, setEmail] = useState("");
+  const [link, setLink]   = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult]   = useState(null);
 
   async function handleSend() {
     if (!email.trim()) return;
@@ -57,136 +56,229 @@ export default function App() {
   return (
     <>
       <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0C0C0E; }
-        input, textarea, button { font-family: inherit; }
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          background: #060D18;
+          background-image:
+            linear-gradient(rgba(0,240,180,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,240,180,0.03) 1px, transparent 1px);
+          background-size: 32px 32px;
+          min-height: 100vh;
+        }
+
+        @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes spin   { to{transform:rotate(360deg)} }
+        @keyframes glitch {
+          0%,100%{text-shadow: 2px 0 #FF2D6B, -2px 0 #00F0B4}
+          33%    {text-shadow:-2px 0 #FF2D6B,  2px 0 #00F0B4}
+          66%    {text-shadow: 2px 2px #FF2D6B,-2px -2px #00F0B4}
+        }
+        @keyframes scanline {
+          0%   { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
+        }
+
+        .scanline {
+          position: fixed; top: 0; left: 0; width: 100%; height: 40px;
+          background: linear-gradient(transparent, rgba(0,240,180,0.04), transparent);
+          pointer-events: none; z-index: 0;
+          animation: scanline 6s linear infinite;
+        }
+
+        input, textarea, button { font-family: 'VT323', monospace; }
+
         input:focus, textarea:focus {
-          outline: none;
-          border-color: #7C3AED !important;
-          box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+          outline: none !important;
+          border-color: #FFD60A !important;
+          box-shadow: 4px 4px 0 #FFD60A !important;
+          caret-color: #FFD60A;
         }
-        .btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-        .btn:active:not(:disabled) { transform: translateY(0); }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .tab:hover { color: #A78BFA; }
-        textarea { resize: vertical; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 480px) {
-          .card { border-radius: 12px; }
-          .inner { padding: 20px !important; }
-          .head  { padding: 24px 20px 20px !important; }
+
+        .px-btn {
+          font-family: 'Press Start 2P', monospace;
+          font-size: 10px;
+          background: #00F0B4;
+          color: #060D18;
+          border: none;
+          padding: 14px 20px;
+          cursor: pointer;
+          width: 100%;
+          border-bottom: 4px solid #009970;
+          border-right: 4px solid #009970;
+          border-top: 4px solid #80FBD8;
+          border-left: 4px solid #80FBD8;
+          transition: transform 0.05s;
+          letter-spacing: 1px;
+          line-height: 1.8;
         }
+        .px-btn:hover:not(:disabled) {
+          background: #FFD60A;
+          border-bottom-color: #9A8200;
+          border-right-color: #9A8200;
+          border-top-color: #FFED80;
+          border-left-color: #FFED80;
+        }
+        .px-btn:active:not(:disabled) {
+          transform: translate(2px, 2px);
+          border-bottom-width: 2px;
+          border-right-width: 2px;
+        }
+        .px-btn:disabled {
+          background: #1A3040;
+          color: #2A5060;
+          border-color: #1A3040;
+          cursor: not-allowed;
+        }
+
+        .px-tab {
+          font-family: 'Press Start 2P', monospace;
+          font-size: 8px;
+          background: transparent;
+          color: #2A6050;
+          border: none;
+          border-bottom: 4px solid transparent;
+          padding: 16px 8px;
+          cursor: pointer;
+          width: 100%;
+          transition: color 0.1s, border-color 0.1s;
+          line-height: 2;
+          letter-spacing: 0.5px;
+        }
+        .px-tab:hover { color: #00F0B4; }
+        .px-tab.active {
+          color: #00F0B4;
+          border-bottom: 4px solid #00F0B4;
+          background: rgba(0,240,180,0.04);
+        }
+
+        .px-input {
+          background: #030810;
+          border-top: 2px solid #0A2535;
+          border-left: 2px solid #0A2535;
+          border-bottom: 2px solid #1A6050;
+          border-right: 2px solid #1A6050;
+          color: #00F0B4;
+          font-family: 'VT323', monospace;
+          font-size: 20px;
+          padding: 10px 12px;
+          width: 100%;
+          transition: border-color 0.1s, box-shadow 0.1s;
+          letter-spacing: 1px;
+        }
+
+        .px-textarea {
+          height: 110px;
+          resize: none;
+          line-height: 1.5;
+          font-size: 17px;
+        }
+
+        ::placeholder { color: #1A4535; }
       `}</style>
 
+      <div className="scanline" />
+
       <div style={S.root}>
-        <div style={S.aurora} />
+        <div style={S.card}>
 
-        <div className="card" style={S.card}>
-
-          <div className="head" style={S.head}>
-            <div style={S.logo}>AM</div>
-            <h1 style={S.title}>Aktivasi ALight Motion</h1>
-            <p style={S.sub}>Masuk ke akun Alight Creative kamu</p>
+          {/* ── Header ── */}
+          <div style={S.head}>
+            <div style={S.logoRow}>
+              <div style={S.logo}>AM</div>
+              <div style={S.titleBlock}>
+                <div style={S.eyebrow}>// ALIGHT CREATIVE</div>
+                <h1 style={S.title}>AKTIVASI</h1>
+              </div>
+            </div>
+            <div style={S.divider} />
+            <p style={S.sub}>
+              <span style={S.cursor}>▋</span> MASUKKAN EMAIL DAN LINK VERIF
+            </p>
           </div>
 
+          {/* ── Tabs ── */}
           <div style={S.tabs}>
-            {["send", "verif"].map((t, i) => (
-              <button
-                key={t}
-                className="tab"
-                style={{ ...S.tab, ...(tab === t ? S.tabOn : {}) }}
-                onClick={() => switchTab(t)}
-              >
-                <span style={S.tabNum}>{i + 1}</span>
-                {t === "send" ? "Kirim Kode" : "Verifikasi"}
-              </button>
-            ))}
+            <button className={`px-tab ${tab === "send" ? "active" : ""}`}
+              onClick={() => switchTab("send")}>
+              [1] KIRIM KODE
+            </button>
+            <button className={`px-tab ${tab === "verif" ? "active" : ""}`}
+              onClick={() => switchTab("verif")}>
+              [2] VERIFIKASI
+            </button>
           </div>
 
-          <div className="inner" style={S.inner}>
+          {/* ── Body ── */}
+          <div style={S.body}>
 
             {tab === "send" ? (
               <div style={S.fields}>
-                <Field label="Alamat Email">
-                  <input
-                    style={S.input}
-                    type="email"
-                    placeholder="contoh@email.com"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleSend()}
-                  />
-                </Field>
-                <button className="btn" style={S.btn} onClick={handleSend}
+                <label style={S.label}>&gt; ALAMAT EMAIL</label>
+                <input
+                  className="px-input"
+                  type="email"
+                  placeholder="contoh@email.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleSend()}
+                />
+                <div style={{ height: 12 }} />
+                <button className="px-btn" onClick={handleSend}
                   disabled={loading || !email.trim()}>
-                  {loading ? <Spinner /> : "Kirim Kode Aktivasi →"}
+                  {loading ? "MENGIRIM..." : "► KIRIM KODE AKTIVASI"}
                 </button>
-                <p style={S.hint}>Cek inbox atau folder spam setelah mengirim.</p>
+                <p style={S.hint}>* CEK INBOX / SPAM SETELAH KIRIM</p>
               </div>
             ) : (
               <div style={S.fields}>
                 {email && (
                   <div style={S.emailTag}>
-                    <span style={S.emailDot} />
-                    {email}
+                    <span style={S.dot} />
+                    EMAIL: {email}
                   </div>
                 )}
-                <Field label="Link Verifikasi dari Email">
-                  <textarea
-                    style={{ ...S.input, height: 110, lineHeight: 1.55, paddingTop: 10 }}
-                    placeholder={"Paste link alight... di sini"}
-                    value={link}
-                    onChange={e => setLink(e.target.value)}
-                  />
-                </Field>
-                <button className="btn" style={S.btn} onClick={handleVerif}
+                <label style={S.label}>&gt; LINK VERIFIKASI</label>
+                <textarea
+                  className="px-input px-textarea"
+                  placeholder="PASTE LINK DARI EMAIL DI SINI..."
+                  value={link}
+                  onChange={e => setLink(e.target.value)}
+                />
+                <div style={{ height: 12 }} />
+                <button className="px-btn" onClick={handleVerif}
                   disabled={loading || !link.trim()}>
-                  {loading ? <Spinner /> : "Verifikasi Sekarang →"}
+                  {loading ? "MEMPROSES..." : "► VERIFIKASI SEKARANG"}
                 </button>
                 {!email && (
-                  <p style={{ ...S.hint, color: "#7C3AED" }}>
-                    ⚠ Kirim kode di tab 1 dulu agar email terisi otomatis.
+                  <p style={{ ...S.hint, color: "#FF2D6B" }}>
+                    ! KIRIM KODE DI TAB [1] DULU
                   </p>
                 )}
               </div>
             )}
 
+            {/* ── Result ── */}
             {result && (
-              <div style={{ ...S.result, ...(result.ok ? S.ok : S.err) }}>
-                <span style={{ ...S.badge, color: result.ok ? "#34D399" : "#F87171" }}>
-                  {result.ok ? "✓ Berhasil" : "✗ Gagal"}
-                </span>
-                <p style={S.resultMsg}>{result.msg}</p>
+              <div style={{ ...S.result, ...(result.ok ? S.resultOk : S.resultErr) }}>
+                <div style={S.resultHead}>
+                  {result.ok ? "[ OK ] BERHASIL" : "[ERR] GAGAL"}
+                </div>
+                <div style={S.resultMsg}>{result.msg}</div>
               </div>
             )}
           </div>
 
+          {/* ── Footer ── */}
           <div style={S.foot}>
-            <span style={S.footTxt}>Hiura</span>
+            <span style={S.footTxt}>ZNN-ALIGHTMOTION.VERCEL.APP</span>
           </div>
+
         </div>
       </div>
     </>
-  );
-}
-
-function Field({ label, children }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <label style={S.label}>{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <span style={{
-      display: "inline-block", width: 16, height: 16,
-      border: "2px solid rgba(255,255,255,0.3)",
-      borderTopColor: "#fff", borderRadius: "50%",
-      animation: "spin 0.7s linear infinite",
-    }} />
   );
 }
 
@@ -194,128 +286,134 @@ const S = {
   root: {
     minHeight: "100vh",
     display: "flex", alignItems: "center", justifyContent: "center",
-    background: "#0C0C0E",
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
-    padding: 24,
-    position: "relative",
-    overflow: "hidden",
-  },
-  aurora: {
-    position: "absolute", top: -160, left: "50%",
-    transform: "translateX(-50%)",
-    width: 560, height: 440,
-    background: "radial-gradient(ellipse at center, rgba(109,40,217,0.20) 0%, transparent 68%)",
-    pointerEvents: "none",
-    filter: "blur(2px)",
+    padding: 20,
+    position: "relative", zIndex: 1,
   },
   card: {
-    background: "#111113",
-    border: "1px solid #222226",
-    borderRadius: 16,
-    width: "100%", maxWidth: 420,
-    position: "relative", zIndex: 1,
-    boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
+    width: "100%", maxWidth: 400,
+    background: "#080F1C",
+    borderTop: "4px solid #00F0B4",
+    borderLeft: "4px solid #00F0B4",
+    borderBottom: "4px solid #006B50",
+    borderRight: "4px solid #006B50",
+    boxShadow: "6px 6px 0 #001A10",
   },
   head: {
-    padding: "32px 32px 24px",
-    textAlign: "center",
-    borderBottom: "1px solid #1C1C20",
+    padding: "24px 24px 16px",
+    borderBottom: "2px solid #0A2535",
+  },
+  logoRow: {
+    display: "flex", alignItems: "center", gap: 16, marginBottom: 14,
   },
   logo: {
-    display: "inline-flex", alignItems: "center", justifyContent: "center",
     width: 52, height: 52,
-    background: "linear-gradient(135deg, #6D28D9 0%, #9333EA 100%)",
-    borderRadius: 13,
-    color: "#fff", fontSize: 17, fontWeight: 800, letterSpacing: "-0.5px",
-    marginBottom: 16,
-    boxShadow: "0 6px 24px rgba(109,40,217,0.45)",
+    background: "#00F0B4",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontFamily: "'Press Start 2P', monospace",
+    fontSize: 14, color: "#060D18", fontWeight: 400,
+    borderBottom: "4px solid #006B50",
+    borderRight: "4px solid #006B50",
+    borderTop: "4px solid #80FBD8",
+    borderLeft: "4px solid #80FBD8",
+    flexShrink: 0,
+  },
+  titleBlock: {
+    display: "flex", flexDirection: "column", gap: 6,
+  },
+  eyebrow: {
+    fontFamily: "'VT323', monospace",
+    fontSize: 16, color: "#1A6050", letterSpacing: 2,
   },
   title: {
-    fontSize: 19, fontWeight: 700, color: "#F1F1F3",
-    letterSpacing: "-0.3px", marginBottom: 6,
+    fontFamily: "'Press Start 2P', monospace",
+    fontSize: 18, color: "#00F0B4",
+    letterSpacing: 2,
+    textShadow: "2px 2px 0 #006B50",
+    animation: "glitch 5s ease-in-out infinite",
   },
-  sub: { fontSize: 13, color: "#5A5A66" },
+  divider: {
+    height: 2,
+    background: "repeating-linear-gradient(90deg, #00F0B4 0, #00F0B4 8px, transparent 8px, transparent 16px)",
+    marginBottom: 12,
+  },
+  sub: {
+    fontFamily: "'VT323', monospace",
+    fontSize: 16, color: "#1A6050", letterSpacing: 2,
+  },
+  cursor: {
+    animation: "blink 1s step-end infinite",
+    color: "#00F0B4",
+  },
   tabs: {
     display: "grid", gridTemplateColumns: "1fr 1fr",
-    borderBottom: "1px solid #1C1C20",
+    borderBottom: "2px solid #0A2535",
   },
-  tab: {
-    background: "transparent", border: "none",
-    borderBottom: "2px solid transparent",
-    color: "#4A4A57",
-    fontSize: 13, fontWeight: 600,
-    padding: "13px 12px",
-    cursor: "pointer",
-    transition: "color 0.15s, border-color 0.15s, background 0.15s",
-    display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+  body: {
+    padding: "20px 24px 24px",
   },
-  tabOn: {
-    color: "#A78BFA",
-    borderBottomColor: "#7C3AED",
-    background: "rgba(109,40,217,0.05)",
+  fields: {
+    display: "flex", flexDirection: "column",
   },
-  tabNum: {
-    display: "inline-flex", alignItems: "center", justifyContent: "center",
-    width: 18, height: 18,
-    background: "rgba(124,58,237,0.2)",
-    borderRadius: "50%",
-    fontSize: 10, fontWeight: 800, color: "#A78BFA",
-  },
-  inner: {
-    padding: "24px 32px 28px",
-    display: "flex", flexDirection: "column", gap: 0,
-  },
-  fields: { display: "flex", flexDirection: "column", gap: 14 },
   label: {
-    fontSize: 11, fontWeight: 700, letterSpacing: "0.6px",
-    textTransform: "uppercase", color: "#52525E",
+    fontFamily: "'Press Start 2P', monospace",
+    fontSize: 8, color: "#00A070",
+    letterSpacing: 1, marginBottom: 8,
+    lineHeight: 2,
   },
-  input: {
-    background: "#0C0C0E",
-    border: "1px solid #222226",
-    borderRadius: 8,
-    color: "#E8E8ED",
-    fontSize: 14,
-    padding: "11px 13px",
-    width: "100%",
-    transition: "border-color 0.15s, box-shadow 0.15s",
+  hint: {
+    fontFamily: "'VT323', monospace",
+    fontSize: 15, color: "#1A5040",
+    letterSpacing: 1, marginTop: 10,
+    lineHeight: 1.5,
   },
-  btn: {
-    marginTop: 4,
-    background: "linear-gradient(135deg, #6D28D9 0%, #9333EA 100%)",
-    border: "none", borderRadius: 8,
-    color: "#fff", fontSize: 14, fontWeight: 700,
-    padding: "13px 20px",
-    cursor: "pointer",
-    transition: "opacity 0.15s, transform 0.1s",
-    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-    boxShadow: "0 4px 16px rgba(109,40,217,0.3)",
-    letterSpacing: "0.1px",
-  },
-  hint: { fontSize: 12, color: "#3E3E4A", textAlign: "center", lineHeight: 1.6 },
-  result: {
-    marginTop: 20, borderRadius: 8,
-    padding: "13px 16px", border: "1px solid",
-  },
-  ok: { background: "rgba(16,185,129,0.06)", borderColor: "rgba(16,185,129,0.22)" },
-  err: { background: "rgba(239,68,68,0.06)", borderColor: "rgba(239,68,68,0.22)" },
-  badge: {
-    display: "block",
-    fontSize: 11, fontWeight: 800,
-    letterSpacing: "0.7px", textTransform: "uppercase", marginBottom: 5,
-  },
-  resultMsg: { fontSize: 13, color: "#8A8A99", lineHeight: 1.6 },
   emailTag: {
     display: "flex", alignItems: "center", gap: 8,
-    background: "rgba(109,40,217,0.08)",
-    border: "1px solid rgba(109,40,217,0.2)",
-    borderRadius: 6, padding: "8px 12px",
-    fontSize: 13, color: "#A78BFA", fontWeight: 500,
+    fontFamily: "'VT323', monospace",
+    fontSize: 18, color: "#00F0B4",
+    letterSpacing: 1,
+    background: "rgba(0,240,180,0.06)",
+    borderLeft: "3px solid #00F0B4",
+    padding: "8px 12px",
+    marginBottom: 14,
   },
-  emailDot: {
-    width: 7, height: 7, borderRadius: "50%",
-    background: "#7C3AED", flexShrink: 0,
+  dot: {
+    width: 8, height: 8,
+    background: "#00F0B4",
+    flexShrink: 0,
+    animation: "blink 1.5s step-end infinite",
   },
-  foot: { borderTop: "1px solid #1A1A1E", padding: "12px 32px", textAlign: "center" },
-  footTxt: { fontSize: 11, color: "#2E2E38", letterSpacing: "0.3px" },
+  result: {
+    marginTop: 16,
+    padding: "12px 14px",
+    borderLeft: "4px solid",
+  },
+  resultOk: {
+    background: "rgba(0,240,180,0.05)",
+    borderLeftColor: "#00F0B4",
+  },
+  resultErr: {
+    background: "rgba(255,45,107,0.05)",
+    borderLeftColor: "#FF2D6B",
+  },
+  resultHead: {
+    fontFamily: "'Press Start 2P', monospace",
+    fontSize: 8, marginBottom: 8,
+    letterSpacing: 1, lineHeight: 2,
+    color: "#00F0B4",
+  },
+  resultMsg: {
+    fontFamily: "'VT323', monospace",
+    fontSize: 18, color: "#1A8060",
+    letterSpacing: 1, lineHeight: 1.5,
+  },
+  foot: {
+    borderTop: "2px solid #0A2535",
+    padding: "10px 24px",
+    textAlign: "center",
+  },
+  footTxt: {
+    fontFamily: "'VT323', monospace",
+    fontSize: 14, color: "#0A3525",
+    letterSpacing: 2,
+  },
 };
