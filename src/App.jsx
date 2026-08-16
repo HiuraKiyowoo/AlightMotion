@@ -25,16 +25,26 @@ export default function App() {
   const [verifResult, setVerifResult] = useState(null);
   const [sent, setSent] = useState(false);
 
+  async function safePost(url, payload) {
+    const res  = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      // API returned non-JSON (HTML error page, plain text, etc.)
+      return { status: false, message: text.slice(0, 200) || `HTTP ${res.status}` };
+    }
+  }
+
   async function handleSend() {
     if (!email.trim()) return;
     setSending(true); setSendResult(null);
     try {
-      const res  = await fetch(SEND_URL, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-      const data = await res.json();
+      const data = await safePost(SEND_URL, { email: email.trim() });
       setSendResult({ ok: data.status, msg: data.message });
       if (data.status) setSent(true);
     } catch (e) {
@@ -48,12 +58,7 @@ export default function App() {
     setVerifying(true); setVerifResult(null);
     try {
       const decoded = extractLink(link.trim());
-      const res  = await fetch(VERIFY_URL, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), link: decoded }),
-      });
-      const data = await res.json();
+      const data = await safePost(VERIFY_URL, { email: email.trim(), link: decoded });
       setVerifResult({ ok: data.status, msg: data.message });
     } catch (e) {
       setVerifResult({ ok: false, msg: e.message });
@@ -225,8 +230,8 @@ export default function App() {
           AMACTIVATOR
         </div>
         <nav style={{ display: "flex", gap: 24 }}>
-          <a href="#aktifkan" style={S.navLink}>By</a>
-          <a href="#cara-pakai" style={S.navLink}>Hiura</a>
+          <a href="#aktifkan" style={S.navLink}>Aktifkan</a>
+          <a href="#cara-pakai" style={S.navLink}>Cara Pakai</a>
         </nav>
       </header>
 
@@ -234,7 +239,7 @@ export default function App() {
 
         {/* Hero */}
         <section style={S.hero} id="aktifkan">
-          <div style={S.eyebrow}>alight creative activation</div>
+          <div style={S.eyebrow}>ZNN // alight creative activation</div>
           <h1 style={S.h1}>
             Masukkan email.<br />
             Aktifkan <span style={{ color: "var(--mint)" }}>akunnya.</span>
@@ -283,7 +288,7 @@ export default function App() {
           <div className="slot">
             <div className="slot-icon">▶</div>
             <textarea
-              placeholder={"Paste link verifikasi dari email di sini..."}
+              placeholder={"Paste link verifikasi dari email di sini...\n(bisa format javascript:parent.ActionWin... atau URL biasa)"}
               value={link}
               onChange={e => setLink(e.target.value)}
             />
@@ -349,8 +354,8 @@ export default function App() {
       </main>
 
       <footer style={S.footer}>
-        <span>AMACTIVATOR — HIURA</span>
-        <span style={{ color: "var(--dim)" }}>made with</span>
+        <span>AMACTIVATOR — znn-alightmotion.vercel.app</span>
+        <span style={{ color: "var(--dim)" }}>made with ♥</span>
       </footer>
     </>
   );
