@@ -225,8 +225,8 @@ export default function App() {
           AMACTIVATOR
         </div>
         <nav style={{ display: "flex", gap: 24 }}>
-          <a href="#aktifkan" style={S.navLink}>Aktifkan</a>
-          <a href="#cara-pakai" style={S.navLink}>Cara Pakai</a>
+          <a href="#aktifkan" style={S.navLink}>By</a>
+          <a href="#cara-pakai" style={S.navLink}>Hiura</a>
         </nav>
       </header>
 
@@ -234,7 +234,7 @@ export default function App() {
 
         {/* Hero */}
         <section style={S.hero} id="aktifkan">
-          <div style={S.eyebrow}>ZNN // alight creative activation</div>
+          <div style={S.eyebrow}>alight creative activation</div>
           <h1 style={S.h1}>
             Masukkan email.<br />
             Aktifkan <span style={{ color: "var(--mint)" }}>akunnya.</span>
